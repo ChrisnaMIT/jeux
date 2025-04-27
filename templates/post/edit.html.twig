@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <h1>Modifie ton post</h1>
+
+    {{ form_start(form) }}
+        <p>Le titre: {{ form_widget(form.title) }}</p>
+    <br>
+        <p>Le content: {{ form_widget(form.content) }}</p>
+    <button type="submit">Valider</button>
+    {{ form_end(form) }}
+
+
+
+{% endblock %}
