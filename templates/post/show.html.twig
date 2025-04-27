@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block body  %}
+
+    <div class="card">
+        <h2 class="card-title">{{ post.title }}</h2>
+        <div class="card-body">
+            {% for image in post.images %}
+                <div class="d-flex flex-column justify-content-around align-items-center">
+                    <img src="{{ vich_uploader_asset(image, "imageFile") | imagine_filter('showpost') }}" alt="">
+                </div>
+            {% endfor %}
+
+             {% if app.user %}
+                {% if post.author == app.user %}
+            <p>Tu as écrit ce post </p>
+                {% endif %}
+            {% endif %}
+            <a href="{{ path('app_post_delete', {id: post.id}) }}" class="btn btn-primary">Supprimer le post </a>
+            <a href="{{ path('app_posts')}}" class="btn btn-primary">Retour</a>
+            <a href="{{ path('app_post_edit', {id: post.id}) }}" class="btn btn-primary">Pour modifier le post </a>
+        </div>
+    </div>
+
+    <h1>Les commentaires :</h1>
+
+    {% for comment in comments %}
+        <p>{{ comment.content }}</p>
+    {% else %}
+        <p>Aucun commentaire</p>
+    {% endfor %}
+
+
+    <h3>Ecrit un commentaire</h3>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit">Envoyer</button>
+    {{ form_end(form) }}
+
+
+
+{% endblock %}

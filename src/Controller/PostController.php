@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Image;
 use App\Entity\Post;
 use App\Form\CommentType;
+use App\Form\ImageType;
 use App\Form\PostType;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -108,6 +110,51 @@ final class PostController extends AbstractController
 
         return $this->redirectToRoute('app_posts');
     }
+
+    #[Route('/post/addimage', name: 'app_post_addimage')]
+    public function addImage(Post $post, Request $request, EntityManagerInterface $manager): Response
+    {
+        if(!$this->getUser() || $post)
+        {
+            return $this->redirectToRoute('app_login');
+        }
+        if($post-getAuthor() !== $this->getUser())
+        {
+            return $this->redirectToRoute('app_post_show', ['id' => $post->getId()]);
+        }
+        $image = new Image();
+        $form = $this->createForm(ImageType::class, $image);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $image->setPost($post);
+            $manager->persist($image);
+            $manager->flush();
+            return $this->redirectToRoute('app_post_addimage', ['id' => $post->getId()]);
+        }
+        return $this->render('post/image.html.twig', [
+            'post' => $post,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/post/remove-image/{id}', name: 'app_post_removeimage')]
+    public function removeImage(Request $request, Image $image, EntityManagerInterface $manager): Response
+    {
+        if(!$this->getUser() || $image)
+        {
+            return $this->redirectToRoute('app_login');
+        }
+        if($image->getPost()- $this->getAuthor() !== $this->getUser())
+        {
+            return $this->redirectToRoute('app_post_show', ['id' => $image->getPost()->getId()]);
+        }
+        $postId = $image->getPost()->getId();
+        $manager->remove($image);
+        $manager->flush();
+        return $this->redirectToRoute('app_post_addimage', ['id' => $postId]);
+    }
+
+
 
 
 }
